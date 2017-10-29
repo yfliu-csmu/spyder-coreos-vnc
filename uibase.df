@@ -1,0 +1,31 @@
+FROM ubuntu:16.04
+MAINTAINER Y.F. Liu <yfliu@csmu.edu.tw>
+
+USER root
+
+# 使用Ubuntu官方的Apt-get源
+
+RUN  echo "deb http://archive.ubuntu.com/ubuntu trusty main universe\n" > /etc/apt/sources.list \
+ && echo "deb http://archive.ubuntu.com/ubuntu trusty-updates main universe\n" >> /etc/apt/sources.list
+
+# 更新源
+
+RUN apt-get update -qqy
+
+# 添加具有免密码sudo权限的普通用用户
+
+RUN useradd yfliu --shell /bin/bash --create-home \
+ && usermod -a -G sudo yfliu \
+ && echo 'yfliu ALL = (ALL) NOPASSWD: ALL' >> /etc/sudoers \
+ && echo 'yfliu:bio608' | chpasswd
+
+# 安装其他基础软件
+
+RUN apt-get -qqy --no-install-recommends install curl wget xterm
+
+# 删除不必要的软件和Apt缓存包列表
+
+RUN apt-get autoclean && \
+    apt-get autoremove && \
+    rm -rf /var/lib/apt/lists/*
+
